@@ -7,7 +7,10 @@ const {
   getAllComplaints,
   updateComplaintStatus,
   updatePriority,
+  getDashboardStats,
 } = require("../controllers/adminController");
+
+router.get("/dashboard", protect, adminOnly, getDashboardStats);
 
 router.get("/complaints", protect, adminOnly, getAllComplaints);
 

@@ -7,6 +7,7 @@ const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/authRoutes");
 const complaintRoutes = require("./routes/complaintRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const noticeRoutes = require("./routes/noticeRoutes");
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(morgan("dev"));
 app.use("/api/auth", authRoutes);
 app.use("/api/complaints", complaintRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/notices", noticeRoutes);
 
 // Health Check Route
 app.get("/", (req, res) => {

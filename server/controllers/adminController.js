@@ -88,8 +88,47 @@ const updatePriority = async (req, res) => {
   }
 };
 
+// Dashboard Statistics
+const getDashboardStats = async (req, res) => {
+  try {
+    const totalComplaints = await Complaint.countDocuments();
+
+    const open = await Complaint.countDocuments({ status: "Open" });
+
+    const inProgress = await Complaint.countDocuments({
+      status: "In Progress",
+    });
+
+    const resolved = await Complaint.countDocuments({
+      status: "Resolved",
+    });
+
+    const highPriority = await Complaint.countDocuments({
+      priority: "High",
+    });
+
+    res.status(200).json({
+      success: true,
+      dashboard: {
+        totalComplaints,
+        open,
+        inProgress,
+        resolved,
+        highPriority,
+      },
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   getAllComplaints,
   updateComplaintStatus,
   updatePriority,
+  getDashboardStats,
 };
