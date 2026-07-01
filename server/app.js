@@ -3,6 +3,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 
+const complaintRoutes = require("./routes/complaintRoutes");
 const authRoutes = require("./routes/authRoutes");
 
 const app = express();
@@ -12,6 +13,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan("dev"));
+app.use("/api/complaints", complaintRoutes);
 
 app.use("/api/auth", authRoutes);
 
