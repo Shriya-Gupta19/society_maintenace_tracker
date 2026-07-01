@@ -12,7 +12,6 @@ const getAllComplaints = async (req, res) => {
       count: complaints.length,
       complaints,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -50,7 +49,37 @@ const updateComplaintStatus = async (req, res) => {
       message: "Complaint status updated successfully",
       complaint,
     });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
+// Update Priority
+const updatePriority = async (req, res) => {
+  try {
+    const { priority } = req.body;
+
+    const complaint = await Complaint.findById(req.params.id);
+
+    if (!complaint) {
+      return res.status(404).json({
+        success: false,
+        message: "Complaint not found",
+      });
+    }
+
+    complaint.priority = priority;
+
+    await complaint.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Priority updated successfully",
+      complaint,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -62,4 +91,5 @@ const updateComplaintStatus = async (req, res) => {
 module.exports = {
   getAllComplaints,
   updateComplaintStatus,
+  updatePriority,
 };

@@ -6,6 +6,7 @@ const { protect, adminOnly } = require("../middleware/authMiddleware");
 const {
   getAllComplaints,
   updateComplaintStatus,
+  updatePriority,
 } = require("../controllers/adminController");
 
 router.get("/complaints", protect, adminOnly, getAllComplaints);
@@ -15,6 +16,13 @@ router.patch(
   protect,
   adminOnly,
   updateComplaintStatus
+);
+
+router.patch(
+  "/complaints/:id/priority",
+  protect,
+  adminOnly,
+  updatePriority
 );
 
 module.exports = router;
