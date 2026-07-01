@@ -1,10 +1,10 @@
 const jwt = require("jsonwebtoken");
 
+// Verify JWT
 const protect = async (req, res, next) => {
   try {
     let token;
 
-    // Read token from Authorization header
     if (
       req.headers.authorization &&
       req.headers.authorization.startsWith("Bearer")
@@ -26,11 +26,26 @@ const protect = async (req, res, next) => {
     next();
 
   } catch (error) {
-    res.status(401).json({
+    return res.status(401).json({
       success: false,
-      message: "Invalid or expired token",
+      message: "Invalid or expired token.",
     });
   }
 };
 
-module.exports = { protect };
+// Admin Only
+const adminOnly = (req, res, next) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({
+      success: false,
+      message: "Admin access only.",
+    });
+  }
+
+  next();
+};
+
+module.exports = {
+  protect,
+  adminOnly,
+};
