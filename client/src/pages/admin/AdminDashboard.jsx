@@ -1,16 +1,21 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import MainLayout from "../../layouts/MainLayout";
+import ActionLink from "../../components/common/ActionLink";
 import StatCard from "../../components/common/StatCard";
 import ComplaintChart from "../../components/dashboard/ComplaintChart";
 import CategoryChart from "../../components/dashboard/CategoryChart";
 import MonthlyTrendChart from "../../components/dashboard/MonthlyTrendChart";
 import api from "../../services/api";
+import toast from "react-hot-toast";
 
 import {
   ClipboardList,
   Clock3,
   CircleCheckBig,
-  TriangleAlert,
+  Plus,
+  Download,
+  AlertTriangle,
 } from "lucide-react";
 
 function AdminDashboard() {
@@ -23,6 +28,7 @@ function AdminDashboard() {
     inProgress: 0,
     resolved: 0,
     highPriority: 0,
+    overdue: 0,
   });
 
   const [complaints, setComplaints] = useState([]);
@@ -45,13 +51,32 @@ function AdminDashboard() {
       setComplaints(complaintsRes.data.complaints);
 
     } catch (error) {
-
-      console.log(error);
-
+      toast.error("Failed to load dashboard data");
     } finally {
 
       setLoading(false);
 
+    }
+  };
+
+  const downloadReport = async () => {
+    try {
+      const response = await api.get("/admin/reports/complaints", {
+        responseType: "blob",
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "complaints-report.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Report downloaded");
+    } catch (error) {
+      toast.error("Unable to download report");
     }
   };
 
@@ -74,21 +99,39 @@ function AdminDashboard() {
   return (
     <MainLayout>
 
-      <div className="mb-10">
+      <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
 
-        <h1 className="text-3xl font-bold text-slate-800">
-          Admin Dashboard
-        </h1>
+        <div>
+          <h1 className="text-3xl font-bold text-slate-800">
+            Admin Dashboard
+          </h1>
 
-        <p className="text-slate-500 mt-2">
-          Society overview and complaint management.
-        </p>
+          <p className="text-slate-500 mt-2">
+            Society overview and complaint management.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <ActionLink to="/admin/notices#create-notice">
+            <Plus size={18} />
+            New Notice
+          </ActionLink>
+
+          <button
+            type="button"
+            onClick={downloadReport}
+            className="inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm"
+          >
+            <Download size={18} />
+            Export CSV
+          </button>
+        </div>
 
       </div>
 
       {/* Statistics Cards */}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6">
 
         <StatCard
           title="Total Complaints"
@@ -105,19 +148,25 @@ function AdminDashboard() {
         />
 
         <StatCard
+          title="In Progress"
+          value={stats.inProgress}
+          icon={<Clock3 size={28} />}
+          color="bg-yellow-500"
+        />
+
+        <StatCard
+          title="Overdue"
+          value={stats.overdue}
+          icon={<AlertTriangle size={28} />}
+          color="bg-red-600"
+        />
+
+        <StatCard
           title="Resolved"
           value={stats.resolved}
           icon={<CircleCheckBig size={28} />}
           color="bg-green-600"
         />
-
-        <StatCard
-          title="High Priority"
-          value={stats.highPriority}
-          icon={<TriangleAlert size={28} />}
-          color="bg-red-600"
-        />
-
       </div>
 
       {/* Analytics */}
@@ -168,8 +217,15 @@ function AdminDashboard() {
 
             <hr />
 
-            <div className="flex justify-between text-lg">
-              <span>High Priority</span>
+            <div className="flex justify-between">
+              <span>Overdue</span>
+              <span className="font-bold text-red-600">
+                {stats.overdue}
+              </span>
+            </div>
+
+            <div className="flex justify-between">
+              <span>High Priority (Open)</span>
               <span className="font-bold text-red-600">
                 {stats.highPriority}
               </span>
@@ -227,7 +283,9 @@ function AdminDashboard() {
 
                   <tr
                     key={item._id}
-                    className="border-b hover:bg-slate-50 transition"
+                    className={`border-b transition ${
+                      item.overdue ? "bg-red-50" : "hover:bg-slate-50"
+                    }`}
                   >
 
                     <td className="py-4">
@@ -248,19 +306,18 @@ function AdminDashboard() {
 
                     <td>
 
-                      <div>
+                      <Link
+                        to={`/admin/complaints/${item._id}`}
+                        className="font-medium text-blue-600 hover:text-blue-700"
+                      >
+                        {item.title}
+                      </Link>
 
-                        <p className="font-medium">
-                          {item.title}
-                        </p>
-
-                        <p className="text-sm text-gray-500">
-                          {item.description?.length > 45
-                            ? item.description.substring(0, 45) + "..."
-                            : item.description}
-                        </p>
-
-                      </div>
+                      <p className="text-sm text-gray-500">
+                        {item.description?.length > 45
+                          ? item.description.substring(0, 45) + "..."
+                          : item.description}
+                      </p>
 
                     </td>
 

@@ -11,6 +11,11 @@ server/.env
 # Build folders
 dist/
 build/
+client/dist/
+
+# Uploaded complaint photos (keep folder marker)
+server/uploads/*
+!server/uploads/.gitkeep
 
 # Logs
 *.log

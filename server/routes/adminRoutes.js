@@ -8,11 +8,14 @@ const {
   updateComplaintStatus,
   updatePriority,
   getDashboardStats,
+  exportComplaintsReport,
 } = require("../controllers/adminController");
 
 router.get("/dashboard", protect, adminOnly, getDashboardStats);
 
 router.get("/complaints", protect, adminOnly, getAllComplaints);
+
+router.get("/reports/complaints", protect, adminOnly, exportComplaintsReport);
 
 router.patch(
   "/complaints/:id/status",

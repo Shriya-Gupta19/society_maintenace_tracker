@@ -10,12 +10,19 @@ const {
   getComplaintById,
 } = require("../controllers/complaintController");
 
-router.post(
-  "/",
-  protect,
-  upload.single("photo"),
-  createComplaint
-);
+const handleUpload = (req, res, next) => {
+  upload.single("photo")(req, res, (error) => {
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+    next();
+  });
+};
+
+router.post("/", protect, handleUpload, createComplaint);
 
 router.get("/my", protect, getMyComplaints);
 router.get("/:id", protect, getComplaintById);

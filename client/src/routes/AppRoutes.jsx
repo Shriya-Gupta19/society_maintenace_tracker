@@ -22,32 +22,16 @@ import ProtectedRoute from "./ProtectedRoute";
 function AppRoutes() {
   return (
     <Routes>
+      <Route path="/" element={<Navigate to="/login" replace />} />
 
-      {/* Default Route */}
-      <Route
-        path="/"
-        element={<Navigate to="/login" replace />}
-      />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
-      {/* Authentication */}
-      <Route
-        path="/login"
-        element={<Login />}
-      />
-
-      <Route
-        path="/register"
-        element={<Register />}
-      />
-
-      {/* ======================= */}
       {/* Resident Routes */}
-      {/* ======================= */}
-
       <Route
         path="/resident/dashboard"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute role="resident">
             <ResidentDashboard />
           </ProtectedRoute>
         }
@@ -56,7 +40,7 @@ function AppRoutes() {
       <Route
         path="/resident/complaints"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute role="resident">
             <MyComplaints />
           </ProtectedRoute>
         }
@@ -65,7 +49,7 @@ function AppRoutes() {
       <Route
         path="/resident/complaints/create"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute role="resident">
             <CreateComplaint />
           </ProtectedRoute>
         }
@@ -74,7 +58,7 @@ function AppRoutes() {
       <Route
         path="/resident/complaints/:id"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute role="resident">
             <ComplaintDetails />
           </ProtectedRoute>
         }
@@ -83,7 +67,7 @@ function AppRoutes() {
       <Route
         path="/resident/notices"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute role="resident">
             <ResidentNotices />
           </ProtectedRoute>
         }
@@ -92,20 +76,17 @@ function AppRoutes() {
       <Route
         path="/resident/profile"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute role="resident">
             <ResidentProfile />
           </ProtectedRoute>
         }
       />
 
-      {/* ======================= */}
       {/* Admin Routes */}
-      {/* ======================= */}
-
       <Route
         path="/admin/dashboard"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute role="admin">
             <AdminDashboard />
           </ProtectedRoute>
         }
@@ -114,8 +95,17 @@ function AppRoutes() {
       <Route
         path="/admin/complaints"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute role="admin">
             <ManageComplaints />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/complaints/:id"
+        element={
+          <ProtectedRoute role="admin">
+            <ComplaintDetails />
           </ProtectedRoute>
         }
       />
@@ -123,7 +113,7 @@ function AppRoutes() {
       <Route
         path="/admin/notices"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute role="admin">
             <AdminNotices />
           </ProtectedRoute>
         }
@@ -132,18 +122,13 @@ function AppRoutes() {
       <Route
         path="/admin/profile"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute role="admin">
             <AdminProfile />
           </ProtectedRoute>
         }
       />
 
-      {/* 404 Route */}
-      <Route
-        path="*"
-        element={<Navigate to="/login" replace />}
-      />
-
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }

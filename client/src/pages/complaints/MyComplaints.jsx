@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Plus } from "lucide-react";
 import MainLayout from "../../layouts/MainLayout";
 import PageHeader from "../../components/common/PageHeader";
+import ActionLink from "../../components/common/ActionLink";
 import Badge from "../../components/common/Badge";
-import api from "../../services/api";
+import api, { API_BASE } from "../../services/api";
 
 function MyComplaints() {
   const [complaints, setComplaints] = useState([]);
@@ -70,6 +72,12 @@ function MyComplaints() {
       <PageHeader
         title="My Complaints"
         subtitle="Track all your submitted complaints."
+        button={
+          <ActionLink to="/resident/complaints/create">
+            <Plus size={18} />
+            New Complaint
+          </ActionLink>
+        }
       />
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
@@ -102,8 +110,14 @@ function MyComplaints() {
             Loading Complaints...
           </div>
         ) : filteredComplaints.length === 0 ? (
-          <div className="text-center py-10 text-gray-500">
-            No complaints found.
+          <div className="text-center py-12">
+            <p className="text-gray-500 mb-4">
+              No complaints found.
+            </p>
+            <ActionLink to="/resident/complaints/create">
+              <Plus size={18} />
+              Raise Your First Complaint
+            </ActionLink>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -118,6 +132,7 @@ function MyComplaints() {
                   <th className="pb-4">Category</th>
                   <th className="pb-4">Priority</th>
                   <th className="pb-4">Status</th>
+                  <th className="pb-4">Overdue</th>
                   <th className="pb-4">Photo</th>
                   <th className="pb-4">Action</th>
 
@@ -155,11 +170,19 @@ function MyComplaints() {
                     </td>
 
                     <td>
+                      {item.overdue && item.status !== "Resolved" ? (
+                        <Badge color="red">Overdue</Badge>
+                      ) : (
+                        <span className="text-sm text-slate-400">—</span>
+                      )}
+                    </td>
+
+                    <td>
 
                       {item.photo ? (
 
                         <img
-                          src={`http://localhost:5000${item.photo}`}
+                          src={`${API_BASE}${item.photo}`}
                           alt=""
                           className="w-14 h-14 rounded-lg object-cover"
                         />
@@ -175,8 +198,8 @@ function MyComplaints() {
                     <td>
 
                       <Link
-                        to={`/complaints/${item._id}`}
-                        className="text-blue-600 font-semibold"
+                        to={`/resident/complaints/${item._id}`}
+                        className="text-blue-600 font-semibold hover:text-blue-700"
                       >
                         View
                       </Link>

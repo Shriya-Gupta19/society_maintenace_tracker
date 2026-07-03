@@ -18,6 +18,11 @@ const noticeSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+
+    important: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

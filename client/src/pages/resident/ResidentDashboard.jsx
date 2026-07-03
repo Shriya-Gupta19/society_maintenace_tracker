@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import MainLayout from "../../layouts/MainLayout";
+import ActionLink from "../../components/common/ActionLink";
 import StatCard from "../../components/common/StatCard";
 import api from "../../services/api";
 
@@ -8,6 +9,7 @@ import {
   Clock3,
   CircleCheckBig,
   Bell,
+  Plus,
 } from "lucide-react";
 
 function ResidentDashboard() {
@@ -86,15 +88,22 @@ function ResidentDashboard() {
 
       {/* Header */}
 
-      <div className="mb-10">
+      <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
 
-        <h1 className="text-3xl font-bold text-slate-800">
-          Resident Dashboard
-        </h1>
+        <div>
+          <h1 className="text-3xl font-bold text-slate-800">
+            Resident Dashboard
+          </h1>
 
-        <p className="text-slate-500 mt-2">
-          Here's an overview of your activity.
-        </p>
+          <p className="text-slate-500 mt-2">
+            Here's an overview of your activity.
+          </p>
+        </div>
+
+        <ActionLink to="/resident/complaints/create">
+          <Plus size={18} />
+          New Complaint
+        </ActionLink>
 
       </div>
 
@@ -155,20 +164,27 @@ function ResidentDashboard() {
               <div className="space-y-5">
 
                 {
-                  notices.slice(0,5).map((notice)=>(
+                  notices.slice(0, 5).map((notice) => (
                     <div
                       key={notice._id}
-                      className="border-l-4 border-blue-600 pl-4"
+                      className={`border-l-4 pl-4 ${
+                        notice.important
+                          ? "border-purple-500"
+                          : "border-blue-600"
+                      }`}
                     >
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold">{notice.title}</h3>
+                        {notice.important && (
+                          <span className="text-[10px] font-bold uppercase tracking-wide bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
+                            Important
+                          </span>
+                        )}
+                      </div>
 
-                      <h3 className="font-semibold">
-                        {notice.title}
-                      </h3>
-
-                      <p className="text-sm text-gray-500 mt-1">
+                      <p className="text-sm text-gray-500 mt-1 line-clamp-2">
                         {notice.content}
                       </p>
-
                     </div>
                   ))
                 }
@@ -243,9 +259,15 @@ function ResidentDashboard() {
         {
           complaints.length === 0 ? (
 
-            <p className="text-gray-500">
-              No complaints found.
-            </p>
+            <div className="text-center py-8">
+              <p className="text-gray-500 mb-4">
+                No complaints found.
+              </p>
+              <ActionLink to="/resident/complaints/create">
+                <Plus size={18} />
+                Raise a Complaint
+              </ActionLink>
+            </div>
 
           ) : (
 

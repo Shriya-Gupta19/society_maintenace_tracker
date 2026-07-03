@@ -1,11 +1,9 @@
-const Complaint = require("../models/Complaint");
+const Complaint = require("../models/complaint");
+const { refreshOverdueFlags } = require("../utils/overdueChecker");
 
 // Create Complaint
 const createComplaint = async (req, res) => {
   try {
-    console.log("BODY:", req.body);
-    console.log("FILE:", req.file);
-
     const { title, category, description } = req.body;
 
     if (!title || !category || !description) {
@@ -47,6 +45,8 @@ const createComplaint = async (req, res) => {
 // Get My Complaints
 const getMyComplaints = async (req, res) => {
   try {
+    await refreshOverdueFlags();
+
     const complaints = await Complaint.find({
       resident: req.user.id,
     }).sort({ createdAt: -1 });
@@ -68,12 +68,23 @@ const getMyComplaints = async (req, res) => {
 // Get Single Complaint
 const getComplaintById = async (req, res) => {
   try {
-    const complaint = await Complaint.findById(req.params.id);
+    const complaint = await Complaint.findById(req.params.id)
+      .populate("history.changedBy", "name role");
 
     if (!complaint) {
       return res.status(404).json({
         success: false,
         message: "Complaint not found",
+      });
+    }
+
+    const isOwner = complaint.resident.toString() === req.user.id;
+    const isAdmin = req.user.role === "admin";
+
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized to view this complaint",
       });
     }
 
