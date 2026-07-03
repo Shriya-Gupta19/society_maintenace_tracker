@@ -48,7 +48,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
   return (
     <aside
-      className={`fixed lg:sticky lg:top-0 inset-y-0 left-0 z-50 w-64 shrink-0 lg:min-h-screen bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-white flex flex-col shadow-xl lg:shadow-none transform transition-transform duration-300 ease-in-out ${
+      className={`fixed lg:sticky lg:top-0 inset-y-0 left-0 z-50 w-64 shrink-0 lg:min-h-screen sidebar-bg border-r border-slate-800/80 text-white flex flex-col shadow-xl lg:shadow-none transform transition-transform duration-300 ease-in-out ${
         sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       }`}
     >
@@ -60,7 +60,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
             </div>
 
             <div className="min-w-0">
-              <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400">
+              <p className="text-base font-bold leading-tight truncate">
                 Society
               </p>
               <h2 className="text-base font-bold leading-tight truncate">

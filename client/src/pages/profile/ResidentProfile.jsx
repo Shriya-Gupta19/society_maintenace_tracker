@@ -80,7 +80,7 @@ function ResidentProfile() {
   if (loading) {
     return (
       <MainLayout>
-        <div className="text-center py-20">
+        <div className="text-center py-20 card-muted">
           Loading...
         </div>
       </MainLayout>
@@ -95,11 +95,11 @@ function ResidentProfile() {
         subtitle="Manage your account."
       />
 
-      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow border border-slate-200 p-8">
+      <div className="form-card max-w-4xl mx-auto">
 
-        <div className="flex items-center gap-6 mb-8">
+        <div className="flex items-center gap-6 mb-8 pb-8 border-b border-slate-700">
 
-          <div className="w-24 h-24 rounded-full bg-blue-600 text-white flex items-center justify-center text-3xl font-bold">
+          <div className="w-24 h-24 rounded-full bg-blue-600 text-white flex items-center justify-center text-3xl font-bold shrink-0">
 
             {form.name.charAt(0)}
 
@@ -107,11 +107,11 @@ function ResidentProfile() {
 
           <div>
 
-            <h2 className="text-2xl font-bold">
+            <h2 className="text-2xl font-bold text-white">
               {form.name}
             </h2>
 
-            <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm capitalize">
+            <span className="inline-block mt-2 bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-sm capitalize font-medium">
 
               {form.role}
 
@@ -128,10 +128,11 @@ function ResidentProfile() {
 
           <div>
 
-            <label>Name</label>
+            <label className="form-label" htmlFor="name">Name</label>
 
             <input
-              className="w-full border rounded-xl p-3 mt-2"
+              id="name"
+              className="form-input"
               name="name"
               value={form.name}
               onChange={handleChange}
@@ -141,10 +142,11 @@ function ResidentProfile() {
 
           <div>
 
-            <label>Email</label>
+            <label className="form-label" htmlFor="email">Email</label>
 
             <input
-              className="w-full border rounded-xl p-3 mt-2 bg-gray-100"
+              id="email"
+              className="form-input"
               value={form.email}
               disabled
             />
@@ -153,10 +155,11 @@ function ResidentProfile() {
 
           <div>
 
-            <label>Phone</label>
+            <label className="form-label" htmlFor="phone">Phone</label>
 
             <input
-              className="w-full border rounded-xl p-3 mt-2"
+              id="phone"
+              className="form-input"
               name="phone"
               value={form.phone}
               onChange={handleChange}
@@ -166,10 +169,11 @@ function ResidentProfile() {
 
           <div>
 
-            <label>Flat Number</label>
+            <label className="form-label" htmlFor="flatNumber">Flat Number</label>
 
             <input
-              className="w-full border rounded-xl p-3 mt-2"
+              id="flatNumber"
+              className="form-input"
               name="flatNumber"
               value={form.flatNumber}
               onChange={handleChange}
@@ -177,11 +181,12 @@ function ResidentProfile() {
 
           </div>
 
-          <div className="md:col-span-2">
+          <div className="md:col-span-2 pt-2">
 
             <button
+              type="submit"
               disabled={saving}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl"
+              className="form-btn"
             >
 
               {saving

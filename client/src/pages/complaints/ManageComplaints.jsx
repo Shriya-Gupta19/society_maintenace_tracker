@@ -7,14 +7,30 @@ import Badge from "../../components/common/Badge";
 import api, { API_BASE } from "../../services/api";
 import toast from "react-hot-toast";
 
+const CATEGORIES = [
+  "Electrical",
+  "Plumbing",
+  "Security",
+  "Cleaning",
+  "Parking",
+  "Lift",
+  "Other",
+];
+
 function ManageComplaints() {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
   const [priorityFilter, setPriorityFilter] = useState("All");
   const [overdueFilter, setOverdueFilter] = useState("All");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+
+  const [pendingUpdate, setPendingUpdate] = useState(null);
+  const [selectKeys, setSelectKeys] = useState({});
 
   useEffect(() => {
     fetchComplaints();
@@ -34,28 +50,67 @@ function ManageComplaints() {
     }
   };
 
-  const updateStatus = async (id, status) => {
+  const confirmUpdate = async () => {
+    if (!pendingUpdate) return;
+
+    const { complaintId, field, value, note } = pendingUpdate;
+
     try {
-      await api.patch(`/admin/complaints/${id}/status`, { status });
-      toast.success("Status updated");
+      if (field === "status") {
+        await api.patch(`/admin/complaints/${complaintId}/status`, {
+          status: value,
+          note: note.trim() || undefined,
+        });
+        toast.success("Status updated");
+      } else {
+        await api.patch(`/admin/complaints/${complaintId}/priority`, {
+          priority: value,
+          note: note.trim() || undefined,
+        });
+        toast.success("Priority updated");
+      }
+
+      setPendingUpdate(null);
       fetchComplaints();
     } catch (error) {
       toast.error(
-        error.response?.data?.message || "Unable to update status"
+        error.response?.data?.message || "Unable to update complaint"
       );
     }
   };
 
-  const updatePriority = async (id, priority) => {
-    try {
-      await api.patch(`/admin/complaints/${id}/priority`, { priority });
-      toast.success("Priority updated");
-      fetchComplaints();
-    } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Unable to update priority"
-      );
+  const cancelUpdate = () => {
+    if (pendingUpdate) {
+      setSelectKeys((prev) => ({
+        ...prev,
+        [pendingUpdate.complaintId]: Date.now(),
+      }));
     }
+    setPendingUpdate(null);
+  };
+
+  const handleStatusChange = (complaint, newStatus) => {
+    if (newStatus === complaint.status) return;
+
+    setPendingUpdate({
+      complaintId: complaint._id,
+      field: "status",
+      value: newStatus,
+      note: "",
+      label: `Update status to "${newStatus}"`,
+    });
+  };
+
+  const handlePriorityChange = (complaint, newPriority) => {
+    if (newPriority === complaint.priority) return;
+
+    setPendingUpdate({
+      complaintId: complaint._id,
+      field: "priority",
+      value: newPriority,
+      note: "",
+      label: `Update priority to "${newPriority}"`,
+    });
   };
 
   const filteredComplaints = useMemo(() => {
@@ -63,8 +118,10 @@ function ManageComplaints() {
       .filter((item) => {
         const matchesSearch =
           item.title.toLowerCase().includes(search.toLowerCase()) ||
-          item.category.toLowerCase().includes(search.toLowerCase()) ||
           item.resident?.name?.toLowerCase().includes(search.toLowerCase());
+
+        const matchesCategory =
+          categoryFilter === "All" || item.category === categoryFilter;
 
         const matchesStatus =
           statusFilter === "All" || item.status === statusFilter;
@@ -77,11 +134,20 @@ function ManageComplaints() {
           (overdueFilter === "Overdue" && item.overdue) ||
           (overdueFilter === "On Track" && !item.overdue);
 
+        const createdAt = new Date(item.createdAt);
+        const matchesDateFrom =
+          !dateFrom || createdAt >= new Date(`${dateFrom}T00:00:00`);
+        const matchesDateTo =
+          !dateTo || createdAt <= new Date(`${dateTo}T23:59:59`);
+
         return (
           matchesSearch &&
+          matchesCategory &&
           matchesStatus &&
           matchesPriority &&
-          matchesOverdue
+          matchesOverdue &&
+          matchesDateFrom &&
+          matchesDateTo
         );
       })
       .sort((a, b) => {
@@ -92,7 +158,16 @@ function ManageComplaints() {
         const priorityRank = { High: 3, Medium: 2, Low: 1 };
         return (priorityRank[b.priority] || 0) - (priorityRank[a.priority] || 0);
       });
-  }, [complaints, search, statusFilter, priorityFilter, overdueFilter]);
+  }, [
+    complaints,
+    search,
+    categoryFilter,
+    statusFilter,
+    priorityFilter,
+    overdueFilter,
+    dateFrom,
+    dateTo,
+  ]);
 
   const statusColor = (status) => {
     if (status === "Resolved") return "green";
@@ -106,78 +181,121 @@ function ManageComplaints() {
     return "green";
   };
 
+  const formatDate = (dateString) =>
+    new Date(dateString).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+
   return (
     <MainLayout>
       <PageHeader
         title="Manage Complaints"
-        subtitle="Overdue complaints are pinned at the top. Update status and priority with full history tracking."
+        subtitle="Filter by category, status, or date. Overdue complaints are pinned at the top."
       />
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+      <div className="content-card">
+        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4 mb-4">
           <input
             type="text"
-            placeholder="Search complaints..."
-            className="border rounded-xl px-4 py-3"
+            placeholder="Search by title or resident..."
+            className="filter-input"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
 
           <select
-            className="border rounded-xl px-4 py-3"
+            className="filter-input"
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+          >
+            <option value="All">All Categories</option>
+            {CATEGORIES.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+
+          <select
+            className="filter-input"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
-            <option>All</option>
+            <option value="All">All Statuses</option>
             <option>Open</option>
             <option>In Progress</option>
             <option>Resolved</option>
           </select>
 
           <select
-            className="border rounded-xl px-4 py-3"
+            className="filter-input"
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value)}
           >
-            <option>All</option>
+            <option value="All">All Priorities</option>
             <option>Low</option>
             <option>Medium</option>
             <option>High</option>
           </select>
 
           <select
-            className="border rounded-xl px-4 py-3"
+            className="filter-input"
             value={overdueFilter}
             onChange={(e) => setOverdueFilter(e.target.value)}
           >
-            <option>All</option>
+            <option value="All">All (Overdue)</option>
             <option>Overdue</option>
             <option>On Track</option>
           </select>
+
+          <input
+            type="date"
+            className="filter-input"
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+            title="From date"
+          />
+
+          <input
+            type="date"
+            className="filter-input"
+            value={dateTo}
+            onChange={(e) => setDateTo(e.target.value)}
+            title="To date"
+          />
         </div>
 
+        {(dateFrom || dateTo || categoryFilter !== "All") && (
+          <p className="text-xs card-muted mb-6">
+            Showing {filteredComplaints.length} of {complaints.length} complaints
+          </p>
+        )}
+
         {loading ? (
-          <div className="text-center py-16 text-lg font-medium">
+          <div className="text-center py-16 text-lg font-medium card-muted">
             Loading complaints...
           </div>
         ) : filteredComplaints.length === 0 ? (
-          <div className="text-center py-16 text-gray-500">
+          <div className="text-center py-16 card-muted">
             No complaints found.
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="border-b bg-slate-50">
+            <table className="w-full data-table">
+              <thead>
                 <tr>
-                  <th className="text-left p-4">Resident</th>
-                  <th className="text-left p-4">Complaint</th>
-                  <th className="text-left p-4">Category</th>
-                  <th className="text-left p-4">Photo</th>
-                  <th className="text-left p-4">Priority</th>
-                  <th className="text-left p-4">Status</th>
-                  <th className="text-left p-4">Overdue</th>
-                  <th className="text-left p-4">Update</th>
-                  <th className="text-left p-4">View</th>
+                  <th className="p-4">Resident</th>
+                  <th className="p-4">Complaint</th>
+                  <th className="p-4">Category</th>
+                  <th className="p-4">Date</th>
+                  <th className="p-4">Photo</th>
+                  <th className="p-4">Priority</th>
+                  <th className="p-4">Status</th>
+                  <th className="p-4">Overdue</th>
+                  <th className="p-4">Update</th>
+                  <th className="p-4">View</th>
                 </tr>
               </thead>
 
@@ -185,39 +303,39 @@ function ManageComplaints() {
                 {filteredComplaints.map((item) => (
                   <tr
                     key={item._id}
-                    className={`border-b transition ${
-                      item.overdue
-                        ? "bg-red-50 hover:bg-red-100/70"
-                        : "hover:bg-slate-50"
-                    }`}
+                    className={item.overdue ? "row-overdue" : ""}
                   >
                     <td className="p-4">
                       <div>
-                        <p className="font-semibold">{item.resident?.name}</p>
-                        <p className="text-sm text-gray-500">
+                        <p className="font-semibold text-white">{item.resident?.name}</p>
+                        <p className="text-sm card-muted">
                           {item.resident?.flatNumber}
                         </p>
                       </div>
                     </td>
 
                     <td className="p-4">
-                      <p className="font-medium">{item.title}</p>
-                      <p className="text-sm text-gray-500 line-clamp-2">
+                      <p className="font-medium text-white">{item.title}</p>
+                      <p className="text-sm card-muted line-clamp-2">
                         {item.description}
                       </p>
                     </td>
 
                     <td className="p-4">{item.category}</td>
 
+                    <td className="p-4 text-sm card-muted whitespace-nowrap">
+                      {formatDate(item.createdAt)}
+                    </td>
+
                     <td className="p-4">
                       {item.photo ? (
                         <img
                           src={`${API_BASE}${item.photo}`}
                           alt="complaint"
-                          className="w-16 h-16 rounded-lg object-cover border"
+                          className="w-16 h-16 rounded-lg object-cover border border-slate-600"
                         />
                       ) : (
-                        <span className="text-gray-400">No Image</span>
+                        <span className="card-muted">No Image</span>
                       )}
                     </td>
 
@@ -243,11 +361,12 @@ function ManageComplaints() {
 
                     <td className="p-4 space-y-3">
                       <select
-                        value={item.status}
+                        key={`status-${item._id}-${selectKeys[item._id] || ""}`}
+                        defaultValue={item.status}
                         onChange={(e) =>
-                          updateStatus(item._id, e.target.value)
+                          handleStatusChange(item, e.target.value)
                         }
-                        className="w-full border rounded-lg p-2"
+                        className="filter-input"
                       >
                         <option>Open</option>
                         <option>In Progress</option>
@@ -255,11 +374,12 @@ function ManageComplaints() {
                       </select>
 
                       <select
-                        value={item.priority}
+                        key={`priority-${item._id}-${selectKeys[item._id] || ""}`}
+                        defaultValue={item.priority}
                         onChange={(e) =>
-                          updatePriority(item._id, e.target.value)
+                          handlePriorityChange(item, e.target.value)
                         }
-                        className="w-full border rounded-lg p-2"
+                        className="filter-input"
                       >
                         <option>Low</option>
                         <option>Medium</option>
@@ -270,7 +390,7 @@ function ManageComplaints() {
                     <td className="p-4">
                       <Link
                         to={`/admin/complaints/${item._id}`}
-                        className="inline-flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-700"
+                        className="inline-flex items-center gap-1 text-blue-400 font-semibold hover:text-blue-300"
                       >
                         <Eye size={16} />
                         Details
@@ -283,6 +403,48 @@ function ManageComplaints() {
           </div>
         )}
       </div>
+
+      {pendingUpdate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm px-4">
+          <div className="form-card w-full max-w-md">
+            <h3 className="text-lg font-bold text-white mb-1">
+              Confirm Update
+            </h3>
+            <p className="text-sm card-muted mb-4">{pendingUpdate.label}</p>
+
+            <label className="form-label" htmlFor="update-note">
+              Note (optional)
+            </label>
+            <textarea
+              id="update-note"
+              rows={3}
+              value={pendingUpdate.note}
+              onChange={(e) =>
+                setPendingUpdate((prev) => ({ ...prev, note: e.target.value }))
+              }
+              className="form-textarea mb-4"
+              placeholder="Add a note for the status history..."
+            />
+
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={cancelUpdate}
+                className="px-4 py-2 rounded-xl border border-slate-600 text-sm font-semibold card-body hover:bg-slate-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmUpdate}
+                className="form-btn px-4 py-2"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </MainLayout>
   );
 }

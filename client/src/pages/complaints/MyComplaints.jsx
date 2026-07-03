@@ -80,7 +80,7 @@ function MyComplaints() {
         }
       />
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+      <div className="content-card">
 
         <div className="flex flex-col md:flex-row gap-4 justify-between mb-6">
 
@@ -89,13 +89,13 @@ function MyComplaints() {
             placeholder="Search Complaint..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="border rounded-xl px-4 py-2 w-full md:w-80"
+            className="filter-input w-full md:w-80"
           />
 
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="border rounded-xl px-4 py-2"
+            className="filter-input"
           >
             <option>All</option>
             <option>Open</option>
@@ -106,12 +106,12 @@ function MyComplaints() {
         </div>
 
         {loading ? (
-          <div className="text-center py-10">
+          <div className="text-center py-10 card-muted">
             Loading Complaints...
           </div>
         ) : filteredComplaints.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500 mb-4">
+            <p className="card-muted mb-4">
               No complaints found.
             </p>
             <ActionLink to="/resident/complaints/create">
@@ -122,19 +122,19 @@ function MyComplaints() {
         ) : (
           <div className="overflow-x-auto">
 
-            <table className="w-full">
+            <table className="w-full data-table">
 
-              <thead className="border-b">
+              <thead>
 
-                <tr className="text-left">
+                <tr>
 
-                  <th className="pb-4">Title</th>
-                  <th className="pb-4">Category</th>
-                  <th className="pb-4">Priority</th>
-                  <th className="pb-4">Status</th>
-                  <th className="pb-4">Overdue</th>
-                  <th className="pb-4">Photo</th>
-                  <th className="pb-4">Action</th>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Overdue</th>
+                  <th>Photo</th>
+                  <th>Action</th>
 
                 </tr>
 
@@ -144,12 +144,9 @@ function MyComplaints() {
 
                 {filteredComplaints.map((item) => (
 
-                  <tr
-                    key={item._id}
-                    className="border-b hover:bg-slate-50"
-                  >
+                  <tr key={item._id}>
 
-                    <td className="py-4">
+                    <td className="text-white font-medium">
                       {item.title}
                     </td>
 
@@ -173,7 +170,7 @@ function MyComplaints() {
                       {item.overdue && item.status !== "Resolved" ? (
                         <Badge color="red">Overdue</Badge>
                       ) : (
-                        <span className="text-sm text-slate-400">—</span>
+                        <span className="text-sm card-muted">—</span>
                       )}
                     </td>
 
@@ -184,12 +181,12 @@ function MyComplaints() {
                         <img
                           src={`${API_BASE}${item.photo}`}
                           alt=""
-                          className="w-14 h-14 rounded-lg object-cover"
+                          className="w-14 h-14 rounded-lg object-cover border border-slate-600"
                         />
 
                       ) : (
 
-                        "No Image"
+                        <span className="card-muted">No Image</span>
 
                       )}
 
@@ -199,7 +196,7 @@ function MyComplaints() {
 
                       <Link
                         to={`/resident/complaints/${item._id}`}
-                        className="text-blue-600 font-semibold hover:text-blue-700"
+                        className="text-blue-400 font-semibold hover:text-blue-300"
                       >
                         View
                       </Link>

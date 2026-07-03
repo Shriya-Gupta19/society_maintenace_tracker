@@ -53,7 +53,7 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex items-center justify-center px-6">
+    <div className="min-h-screen auth-shell-bg flex items-center justify-center px-6">
       <Card className="w-full max-w-lg">
         <div className="flex justify-center mb-6">
           <div className="bg-blue-600 p-4 rounded-full">
@@ -61,11 +61,11 @@ function Register() {
           </div>
         </div>
 
-        <h2 className="text-4xl font-bold text-center">
+        <h2 className="text-4xl font-bold text-center text-white">
           Create Account
         </h2>
 
-        <p className="text-center text-gray-500 mb-8">
+        <p className="text-center card-muted mb-8">
           Society Maintenance Tracker
         </p>
 
@@ -119,11 +119,11 @@ function Register() {
           />
         </form>
 
-        <p className="text-center mt-6">
+        <p className="text-center mt-6 card-muted">
           Already have an account?
           <Link
             to="/login"
-            className="text-blue-600 ml-2 font-semibold"
+            className="text-blue-400 ml-2 font-semibold hover:text-blue-300"
           >
             Login
           </Link>

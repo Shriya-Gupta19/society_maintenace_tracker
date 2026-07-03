@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Camera, ImagePlus, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import MainLayout from "../../layouts/MainLayout";
 import PageHeader from "../../components/common/PageHeader";
@@ -17,10 +17,15 @@ const CATEGORIES = [
   "Other",
 ];
 
+const MAX_PHOTO_SIZE = 5 * 1024 * 1024;
+const ACCEPTED_TYPES = ["image/jpeg", "image/jpg", "image/png"];
+
 function CreateComplaint() {
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
 
   const [loading, setLoading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
 
   const [form, setForm] = useState({
     title: "",
@@ -38,22 +43,49 @@ function CreateComplaint() {
     });
   };
 
-  const handlePhotoChange = (e) => {
-    const file = e.target.files[0];
-
+  const validateAndSetPhoto = (file) => {
     if (!file) {
       setPhoto(null);
       setPhotoPreview(null);
       return;
     }
 
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please upload an image file");
+    if (!ACCEPTED_TYPES.includes(file.type)) {
+      toast.error("Only JPEG and PNG images are allowed");
+      return;
+    }
+
+    if (file.size > MAX_PHOTO_SIZE) {
+      toast.error("Photo must be smaller than 5 MB");
       return;
     }
 
     setPhoto(file);
     setPhotoPreview(URL.createObjectURL(file));
+  };
+
+  const handlePhotoChange = (e) => {
+    validateAndSetPhoto(e.target.files[0]);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    validateAndSetPhoto(e.dataTransfer.files[0]);
+  };
+
+  const removePhoto = () => {
+    setPhoto(null);
+    setPhotoPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const formatFileSize = (bytes) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
   const handleSubmit = async (e) => {
@@ -86,11 +118,7 @@ function CreateComplaint() {
         formData.append("photo", photo);
       }
 
-      const { data } = await api.post("/complaints", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const { data } = await api.post("/complaints", formData);
 
       toast.success(data.message);
       navigate("/resident/complaints");
@@ -107,12 +135,12 @@ function CreateComplaint() {
     <MainLayout>
       <PageHeader
         title="Raise Complaint"
-        subtitle="Submit a new maintenance request with optional photo."
+        subtitle="Submit a maintenance request with category, description, and an optional supporting photo."
       />
 
       <Link
         to="/resident/complaints"
-        className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-blue-600 mb-6 transition-colors"
+        className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-blue-400 mb-6 transition-colors"
       >
         <ArrowLeft size={16} />
         Back to My Complaints
@@ -174,23 +202,98 @@ function CreateComplaint() {
           </div>
 
           <div>
-            <label className="form-label" htmlFor="photo">
-              Upload Photo (optional)
+            <label className="form-label">
+              Supporting Photo
+              <span className="ml-1 font-normal text-slate-400">(optional)</span>
             </label>
-            <input
-              id="photo"
-              type="file"
-              accept="image/*"
-              onChange={handlePhotoChange}
-              className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-            />
+            <p className="text-xs text-slate-400 mb-3">
+              Attach a photo to help admins understand the issue. JPEG or PNG, max 5 MB.
+            </p>
 
-            {photoPreview && (
-              <img
-                src={photoPreview}
-                alt="Preview"
-                className="mt-4 w-40 h-40 rounded-xl object-cover border border-slate-200"
-              />
+            {!photoPreview ? (
+              <div
+                role="button"
+                tabIndex={0}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragOver(true);
+                }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    fileInputRef.current?.click();
+                  }
+                }}
+                className={`relative flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 py-10 cursor-pointer transition-colors ${
+                  dragOver
+                    ? "border-blue-400 bg-blue-500/10"
+                    : "border-slate-600 bg-slate-800/50 hover:border-blue-400 hover:bg-blue-500/5"
+                }`}
+              >
+                <div className="flex items-center justify-center w-14 h-14 rounded-full bg-blue-500/20 text-blue-400">
+                  <ImagePlus size={28} />
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-semibold text-slate-200">
+                    Click to upload or drag and drop
+                  </p>
+                  <p className="text-xs card-muted mt-1">
+                    JPEG, PNG up to 5 MB
+                  </p>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  id="photo"
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png"
+                  onChange={handlePhotoChange}
+                  className="hidden"
+                />
+              </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row gap-4 items-start">
+                <div className="relative shrink-0">
+                  <img
+                    src={photoPreview}
+                    alt="Preview"
+                    className="w-40 h-40 rounded-xl object-cover border border-slate-600"
+                  />
+                  <button
+                    type="button"
+                    onClick={removePhoto}
+                    className="absolute -top-2 -right-2 p-1 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors shadow-sm"
+                    aria-label="Remove photo"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 text-sm font-medium text-slate-200">
+                    <Camera size={16} className="text-blue-400 shrink-0" />
+                    <span className="truncate">{photo?.name}</span>
+                  </div>
+                  <p className="text-xs card-muted mt-1">
+                    {photo && formatFileSize(photo.size)}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="mt-3 text-sm text-blue-400 font-semibold hover:text-blue-300"
+                  >
+                    Change photo
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png"
+                    onChange={handlePhotoChange}
+                    className="hidden"
+                  />
+                </div>
+              </div>
             )}
           </div>
 
@@ -205,7 +308,7 @@ function CreateComplaint() {
 
             <Link
               to="/resident/complaints"
-              className="inline-flex items-center justify-center px-6 py-3 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-xl border border-slate-600 text-sm font-semibold card-body hover:bg-slate-800 transition-colors"
             >
               Cancel
             </Link>

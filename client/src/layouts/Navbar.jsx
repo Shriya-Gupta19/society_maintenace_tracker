@@ -79,26 +79,26 @@ function Navbar({ setSidebarOpen }) {
     .toUpperCase();
 
   return (
-    <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-sm">
+    <header className="sticky top-0 z-30 bg-slate-900/75 backdrop-blur-md border-b border-slate-700/60 shadow-sm">
       <div className="h-16 sm:h-[4.5rem] px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 min-w-0">
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}
-            className="lg:hidden shrink-0 p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
+            className="lg:hidden shrink-0 p-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors"
             aria-label="Open menu"
           >
             <Menu size={22} />
           </button>
 
           <div className="min-w-0">
-            <h1 className="text-lg sm:text-xl font-bold text-slate-800 truncate">
+            <h1 className="text-lg sm:text-xl font-bold text-slate-100 truncate">
               {title}
             </h1>
-            <p className="hidden sm:block text-sm text-slate-500 truncate">
+            <p className="hidden sm:block text-sm text-slate-400 truncate">
               {subtitle}
             </p>
-            <p className="sm:hidden text-xs text-slate-400 truncate">{today}</p>
+            <p className="sm:hidden text-xs text-slate-500 truncate">{today}</p>
           </div>
         </div>
 
@@ -111,35 +111,35 @@ function Navbar({ setSidebarOpen }) {
             <input
               type="search"
               placeholder="Search..."
-              className="w-56 lg:w-64 rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:bg-white focus:border-blue-300 focus:ring-2 focus:ring-blue-500/20 transition"
+              className="w-56 lg:w-64 rounded-xl border border-slate-700 bg-slate-800/60 pl-10 pr-4 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:bg-slate-800 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition"
             />
           </div>
 
           <button
             type="button"
-            className="relative p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors"
+            className="relative p-2 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-colors"
             aria-label="Notifications"
           >
             <Bell size={20} />
           </button>
 
-          <div className="flex items-center gap-3 border-l border-slate-200 pl-3 sm:pl-4">
+          <div className="flex items-center gap-3 border-l border-slate-700 pl-3 sm:pl-4">
             <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-sm font-semibold shadow-sm">
               {initials || "U"}
             </div>
 
             <div className="hidden md:block">
-              <p className="text-sm font-semibold text-slate-800 leading-tight">
+              <p className="text-sm font-semibold text-slate-100 leading-tight">
                 {user?.name}
               </p>
-              <p className="text-xs text-slate-500 capitalize">{user?.role}</p>
+              <p className="text-xs text-slate-400 capitalize">{user?.role}</p>
             </div>
           </div>
         </div>
       </div>
 
       <div className="hidden sm:block px-4 sm:px-6 lg:px-8 pb-3 -mt-1">
-        <p className="text-xs text-slate-400">{today}</p>
+        <p className="text-xs text-slate-500">{today}</p>
       </div>
     </header>
   );

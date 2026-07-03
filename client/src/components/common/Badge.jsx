@@ -1,12 +1,12 @@
 function Badge({ children, color }) {
 
   const styles = {
-    green: "bg-green-100 text-green-700",
-    red: "bg-red-100 text-red-700",
-    blue: "bg-blue-100 text-blue-700",
-    yellow: "bg-yellow-100 text-yellow-700",
-    orange: "bg-orange-100 text-orange-700",
-    purple: "bg-purple-100 text-purple-700",
+    green: "bg-green-500/20 text-green-400",
+    red: "bg-red-500/20 text-red-400",
+    blue: "bg-blue-500/20 text-blue-400",
+    yellow: "bg-yellow-500/20 text-yellow-400",
+    orange: "bg-orange-500/20 text-orange-400",
+    purple: "bg-purple-500/20 text-purple-400",
   };
 
   return (

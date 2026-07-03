@@ -86,7 +86,7 @@ function AdminDashboard() {
 
         <div className="flex justify-center items-center h-[70vh]">
 
-          <h2 className="text-2xl font-semibold">
+          <h2 className="text-2xl font-semibold text-slate-100">
             Loading Dashboard...
           </h2>
 
@@ -102,11 +102,11 @@ function AdminDashboard() {
       <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
 
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">
+          <h1 className="text-3xl font-bold text-slate-100">
             Admin Dashboard
           </h1>
 
-          <p className="text-slate-500 mt-2">
+          <p className="text-slate-400 mt-2">
             Society overview and complaint management.
           </p>
         </div>
@@ -179,54 +179,54 @@ function AdminDashboard() {
 
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div className="content-card">
 
-          <h2 className="text-xl font-semibold mb-6">
+          <h2 className="text-xl font-semibold mb-6 text-white">
             Quick Summary
           </h2>
 
-          <div className="space-y-5">
+          <div className="space-y-5 card-body">
 
             <div className="flex justify-between">
-              <span>Total Complaints</span>
-              <span className="font-bold text-blue-600">
+              <span className="card-muted">Total Complaints</span>
+              <span className="font-bold text-blue-400">
                 {stats.totalComplaints}
               </span>
             </div>
 
             <div className="flex justify-between">
-              <span>Open</span>
-              <span className="font-bold text-orange-500">
+              <span className="card-muted">Open</span>
+              <span className="font-bold text-orange-400">
                 {stats.open}
               </span>
             </div>
 
             <div className="flex justify-between">
-              <span>In Progress</span>
-              <span className="font-bold text-yellow-600">
+              <span className="card-muted">In Progress</span>
+              <span className="font-bold text-yellow-400">
                 {stats.inProgress}
               </span>
             </div>
 
             <div className="flex justify-between">
-              <span>Resolved</span>
-              <span className="font-bold text-green-600">
+              <span className="card-muted">Resolved</span>
+              <span className="font-bold text-green-400">
                 {stats.resolved}
               </span>
             </div>
 
-            <hr />
+            <hr className="border-slate-700" />
 
             <div className="flex justify-between">
-              <span>Overdue</span>
-              <span className="font-bold text-red-600">
+              <span className="card-muted">Overdue</span>
+              <span className="font-bold text-red-400">
                 {stats.overdue}
               </span>
             </div>
 
             <div className="flex justify-between">
-              <span>High Priority (Open)</span>
-              <span className="font-bold text-red-600">
+              <span className="card-muted">High Priority (Open)</span>
+              <span className="font-bold text-red-400">
                 {stats.highPriority}
               </span>
             </div>
@@ -239,25 +239,25 @@ function AdminDashboard() {
 
       {/* Recent Complaints */}
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mt-10">
+      <div className="content-card mt-10">
 
-        <h2 className="text-xl font-semibold mb-6">
+        <h2 className="text-xl font-semibold mb-6 text-white">
           Recent Complaints
         </h2>
 
         <div className="overflow-x-auto">
 
-          <table className="w-full">
+          <table className="w-full data-table">
 
-            <thead className="border-b">
+            <thead>
 
-              <tr className="text-left">
+              <tr>
 
-                <th className="pb-4">Resident</th>
-                <th className="pb-4">Complaint</th>
-                <th className="pb-4">Category</th>
-                <th className="pb-4">Priority</th>
-                <th className="pb-4">Status</th>
+                <th>Resident</th>
+                <th>Complaint</th>
+                <th>Category</th>
+                <th>Priority</th>
+                <th>Status</th>
 
               </tr>
 
@@ -270,7 +270,7 @@ function AdminDashboard() {
 
                   <td
                     colSpan="5"
-                    className="py-10 text-center text-gray-500"
+                    className="py-10 text-center card-muted"
                   >
                     No complaints found.
                   </td>
@@ -283,20 +283,18 @@ function AdminDashboard() {
 
                   <tr
                     key={item._id}
-                    className={`border-b transition ${
-                      item.overdue ? "bg-red-50" : "hover:bg-slate-50"
-                    }`}
+                    className={item.overdue ? "row-overdue" : ""}
                   >
 
-                    <td className="py-4">
+                    <td>
 
                       <div>
 
-                        <p className="font-semibold">
+                        <p className="font-semibold text-white">
                           {item.resident?.name || "N/A"}
                         </p>
 
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm card-muted">
                           {item.resident?.flatNumber || "-"}
                         </p>
 
@@ -308,12 +306,12 @@ function AdminDashboard() {
 
                       <Link
                         to={`/admin/complaints/${item._id}`}
-                        className="font-medium text-blue-600 hover:text-blue-700"
+                        className="font-medium text-blue-400 hover:text-blue-300"
                       >
                         {item.title}
                       </Link>
 
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm card-muted">
                         {item.description?.length > 45
                           ? item.description.substring(0, 45) + "..."
                           : item.description}
@@ -330,10 +328,10 @@ function AdminDashboard() {
                       <span
                         className={`px-3 py-1 rounded-full text-sm font-medium ${
                           item.priority === "High"
-                            ? "bg-red-100 text-red-600"
+                            ? "bg-red-500/20 text-red-400"
                             : item.priority === "Medium"
-                            ? "bg-orange-100 text-orange-600"
-                            : "bg-green-100 text-green-600"
+                            ? "bg-orange-500/20 text-orange-400"
+                            : "bg-green-500/20 text-green-400"
                         }`}
                       >
                         {item.priority}
@@ -346,10 +344,10 @@ function AdminDashboard() {
                       <span
                         className={`px-3 py-1 rounded-full text-sm font-medium ${
                           item.status === "Resolved"
-                            ? "bg-green-100 text-green-600"
+                            ? "bg-green-500/20 text-green-400"
                             : item.status === "In Progress"
-                            ? "bg-blue-100 text-blue-600"
-                            : "bg-yellow-100 text-yellow-600"
+                            ? "bg-blue-500/20 text-blue-400"
+                            : "bg-yellow-500/20 text-yellow-400"
                         }`}
                       >
                         {item.status}

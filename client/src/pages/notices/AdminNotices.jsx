@@ -93,7 +93,7 @@ function AdminNotices() {
           id="create-notice"
           className="form-card scroll-mt-24"
         >
-          <h2 className="text-xl font-semibold mb-5 text-slate-800">
+          <h2 className="text-xl font-semibold mb-5 text-white">
             Create Notice
           </h2>
 
@@ -134,7 +134,7 @@ function AdminNotices() {
                 onChange={(e) => setImportant(e.target.checked)}
                 className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-sm font-medium text-slate-700">
+              <span className="text-sm font-medium card-body">
                 Mark as important (pins to top of notice board)
               </span>
             </label>
@@ -150,16 +150,16 @@ function AdminNotices() {
         </div>
 
         <div className="lg:col-span-2 form-card">
-          <h2 className="text-xl font-semibold mb-6 text-slate-800">
+          <h2 className="text-xl font-semibold mb-6 text-white">
             All Notices
           </h2>
 
           {fetching ? (
-            <p className="text-slate-500 text-center py-10">
+            <p className="card-muted text-center py-10">
               Loading notices...
             </p>
           ) : notices.length === 0 ? (
-            <p className="text-slate-500 text-center py-10">
+            <p className="card-muted text-center py-10">
               No notices available. Create your first notice.
             </p>
           ) : (
@@ -172,7 +172,7 @@ function AdminNotices() {
                   }`}
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3 mb-2">
-                    <h3 className="text-lg font-bold text-slate-800">
+                    <h3 className="text-lg font-bold text-white">
                       {notice.title}
                     </h3>
 
@@ -186,11 +186,11 @@ function AdminNotices() {
                     )}
                   </div>
 
-                  <p className="text-slate-600 leading-relaxed">
+                  <p className="card-body leading-relaxed">
                     {notice.content}
                   </p>
 
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-4 text-sm text-slate-400">
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-4 text-sm card-muted">
                     <span>Posted by {notice.postedBy?.name}</span>
                     <span>{formatDate(notice.createdAt)}</span>
                   </div>

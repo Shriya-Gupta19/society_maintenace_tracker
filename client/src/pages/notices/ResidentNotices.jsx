@@ -43,11 +43,11 @@ function ResidentNotices() {
       />
 
       {loading ? (
-        <div className="form-card text-center py-12 text-slate-500">
+        <div className="form-card text-center py-12 card-muted">
           Loading notices...
         </div>
       ) : notices.length === 0 ? (
-        <div className="form-card text-center py-12 text-slate-500">
+        <div className="form-card text-center py-12 card-muted">
           No notices available at the moment.
         </div>
       ) : (
@@ -60,7 +60,7 @@ function ResidentNotices() {
               }`}
             >
               <div className="flex flex-wrap items-start justify-between gap-3 mb-2">
-                <h2 className="text-xl font-bold text-slate-800">
+                <h2 className="text-xl font-bold text-white">
                   {notice.title}
                 </h2>
 
@@ -74,11 +74,11 @@ function ResidentNotices() {
                 )}
               </div>
 
-              <p className="text-slate-600 leading-relaxed mt-3">
+              <p className="card-body leading-relaxed mt-3">
                 {notice.content}
               </p>
 
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-5 text-sm text-slate-400">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-5 text-sm card-muted">
                 <span>Posted by {notice.postedBy?.name}</span>
                 <span>{formatDate(notice.createdAt)}</span>
               </div>

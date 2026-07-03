@@ -55,7 +55,7 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex items-center justify-center px-6">
+    <div className="min-h-screen auth-shell-bg flex items-center justify-center px-6">
 
       <Card className="w-full max-w-md">
 
@@ -65,11 +65,11 @@ function Login() {
           </div>
         </div>
 
-        <h2 className="text-4xl font-bold text-center">
+        <h2 className="text-4xl font-bold text-center text-white">
           Welcome Back
         </h2>
 
-        <p className="text-center text-gray-500 mb-8">
+        <p className="text-center card-muted mb-8">
           Society Maintenance Tracker
         </p>
 
@@ -101,12 +101,12 @@ function Login() {
 
         </form>
 
-        <p className="text-center mt-6">
+        <p className="text-center mt-6 card-muted">
           Don't have an account?
 
           <Link
             to="/register"
-            className="text-blue-600 ml-2 font-semibold"
+            className="text-blue-400 ml-2 font-semibold hover:text-blue-300"
           >
             Register
           </Link>

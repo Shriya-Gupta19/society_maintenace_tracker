@@ -31,9 +31,9 @@ function ComplaintChart({ stats }) {
   ];
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+    <div className="content-card">
 
-      <h2 className="text-xl font-semibold mb-6">
+      <h2 className="text-xl font-semibold mb-6 text-white">
         Complaint Analytics
       </h2>
 
@@ -47,7 +47,7 @@ function ComplaintChart({ stats }) {
               data={data}
               dataKey="value"
               outerRadius={120}
-              label
+              label={{ fill: "#e2e8f0" }}
             >
 
               {data.map((entry, index) => (
@@ -59,9 +59,16 @@ function ComplaintChart({ stats }) {
 
             </Pie>
 
-            <Tooltip />
+            <Tooltip
+              contentStyle={{
+                background: "#1e293b",
+                border: "1px solid #334155",
+                borderRadius: "0.75rem",
+                color: "#f1f5f9",
+              }}
+            />
 
-            <Legend />
+            <Legend wrapperStyle={{ color: "#94a3b8" }} />
 
           </PieChart>
 

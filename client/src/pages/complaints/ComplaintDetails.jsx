@@ -38,6 +38,12 @@ function ComplaintDetails() {
   const backPath = isAdmin ? "/admin/complaints" : "/resident/complaints";
   const [complaint, setComplaint] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+  const [updateForm, setUpdateForm] = useState({
+    status: "",
+    priority: "",
+    note: "",
+  });
 
   useEffect(() => {
     fetchComplaint();
@@ -48,6 +54,11 @@ function ComplaintDetails() {
       setLoading(true);
       const { data } = await api.get(`/complaints/${id}`);
       setComplaint(data.complaint);
+      setUpdateForm({
+        status: data.complaint.status,
+        priority: data.complaint.priority,
+        note: "",
+      });
     } catch (err) {
       toast.error(
         err.response?.data?.message || "Unable to load complaint"
@@ -57,10 +68,51 @@ function ComplaintDetails() {
     }
   };
 
+  const handleAdminUpdate = async (e) => {
+    e.preventDefault();
+
+    if (!complaint) return;
+
+    const statusChanged = updateForm.status !== complaint.status;
+    const priorityChanged = updateForm.priority !== complaint.priority;
+
+    if (!statusChanged && !priorityChanged) {
+      toast.error("No changes to save");
+      return;
+    }
+
+    try {
+      setUpdating(true);
+
+      if (statusChanged) {
+        await api.patch(`/admin/complaints/${id}/status`, {
+          status: updateForm.status,
+          note: updateForm.note.trim() || undefined,
+        });
+      }
+
+      if (priorityChanged) {
+        await api.patch(`/admin/complaints/${id}/priority`, {
+          priority: updateForm.priority,
+          note: updateForm.note.trim() || undefined,
+        });
+      }
+
+      toast.success("Complaint updated");
+      fetchComplaint();
+    } catch (err) {
+      toast.error(
+        err.response?.data?.message || "Unable to update complaint"
+      );
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   if (loading) {
     return (
       <MainLayout>
-        <div className="form-card text-center py-16 text-slate-500">
+        <div className="form-card text-center py-16 card-muted">
           Loading complaint details...
         </div>
       </MainLayout>
@@ -71,10 +123,10 @@ function ComplaintDetails() {
     return (
       <MainLayout>
         <div className="form-card text-center py-16">
-          <p className="text-slate-500 mb-4">Complaint not found.</p>
+          <p className="card-muted mb-4">Complaint not found.</p>
           <Link
             to={backPath}
-            className="text-blue-600 font-semibold hover:text-blue-700"
+            className="text-blue-400 font-semibold hover:text-blue-300"
           >
             Back to {isAdmin ? "Manage Complaints" : "My Complaints"}
           </Link>
@@ -94,7 +146,7 @@ function ComplaintDetails() {
 
       <Link
         to={backPath}
-        className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-blue-600 mb-6 transition-colors"
+        className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-blue-400 mb-6 transition-colors"
       >
         <ArrowLeft size={16} />
         Back to {isAdmin ? "Manage Complaints" : "My Complaints"}
@@ -104,7 +156,7 @@ function ComplaintDetails() {
         <div className="lg:col-span-2 space-y-6">
           <div className="form-card">
             <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
-              <h2 className="text-2xl font-bold text-slate-800">
+              <h2 className="text-2xl font-bold text-white">
                 {complaint.title}
               </h2>
 
@@ -118,7 +170,7 @@ function ComplaintDetails() {
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-4 text-sm text-slate-500 mb-6">
+            <div className="flex flex-wrap gap-4 text-sm card-muted mb-6">
               <span>Category: {complaint.category}</span>
               <span>Filed: {formatDate(complaint.createdAt)}</span>
               {complaint.overdue && (
@@ -128,30 +180,30 @@ function ComplaintDetails() {
 
             <div>
               <h3 className="form-label">Description</h3>
-              <p className="text-slate-700 leading-relaxed">
+              <p className="card-body leading-relaxed">
                 {complaint.description}
               </p>
             </div>
 
             {complaint.photo && (
               <div className="mt-6">
-                <h3 className="form-label">Attached Photo</h3>
+                <h3 className="form-label">Supporting Photo</h3>
                 <img
                   src={`${API_BASE}${complaint.photo}`}
                   alt={complaint.title}
-                  className="max-w-md w-full rounded-xl border border-slate-200 object-cover"
+                  className="max-w-md w-full rounded-xl border border-slate-600 object-cover"
                 />
               </div>
             )}
           </div>
 
           <div className="form-card">
-            <h3 className="text-xl font-semibold text-slate-800 mb-6">
+            <h3 className="text-xl font-semibold text-white mb-6">
               Status History
             </h3>
 
             {history.length === 0 ? (
-              <p className="text-slate-500">No status changes recorded.</p>
+              <p className="card-muted">No status changes recorded.</p>
             ) : (
               <div className="space-y-0">
                 {history.map((entry, index) => (
@@ -163,20 +215,20 @@ function ComplaintDetails() {
                       <Badge color={statusColor(entry.status)}>
                         {entry.status}
                       </Badge>
-                      <span className="text-xs text-slate-400 inline-flex items-center gap-1">
+                      <span className="text-xs card-muted inline-flex items-center gap-1">
                         <Clock size={12} />
                         {formatDate(entry.changedAt)}
                       </span>
                     </div>
 
                     {entry.note && (
-                      <p className="text-sm text-slate-600 mt-1">
+                      <p className="text-sm card-body mt-1">
                         {entry.note}
                       </p>
                     )}
 
                     {entry.changedBy?.name && (
-                      <p className="text-xs text-slate-400 mt-1">
+                      <p className="text-xs card-muted mt-1">
                         Updated by {entry.changedBy.name}
                       </p>
                     )}
@@ -188,46 +240,124 @@ function ComplaintDetails() {
         </div>
 
         <div className="form-card h-fit">
-          <h3 className="text-lg font-semibold text-slate-800 mb-4">
+          <h3 className="text-lg font-semibold text-white mb-4">
             Summary
           </h3>
 
           <dl className="space-y-4 text-sm">
             <div>
-              <dt className="text-slate-400">Status</dt>
-              <dd className="font-semibold text-slate-800 mt-1">
+              <dt className="card-muted">Status</dt>
+              <dd className="font-semibold text-white mt-1">
                 {complaint.status}
               </dd>
             </div>
 
             <div>
-              <dt className="text-slate-400">Priority</dt>
-              <dd className="font-semibold text-slate-800 mt-1">
+              <dt className="card-muted">Priority</dt>
+              <dd className="font-semibold text-white mt-1">
                 {complaint.priority}
               </dd>
             </div>
 
             <div>
-              <dt className="text-slate-400">Category</dt>
-              <dd className="font-semibold text-slate-800 mt-1">
+              <dt className="card-muted">Category</dt>
+              <dd className="font-semibold text-white mt-1">
                 {complaint.category}
               </dd>
             </div>
 
             <div>
-              <dt className="text-slate-400">Submitted</dt>
-              <dd className="font-semibold text-slate-800 mt-1">
+              <dt className="card-muted">Submitted</dt>
+              <dd className="font-semibold text-white mt-1">
                 {formatDate(complaint.createdAt)}
               </dd>
             </div>
 
             <div>
-              <dt className="text-slate-400">Last Updated</dt>
-              <dd className="font-semibold text-slate-800 mt-1">
+              <dt className="card-muted">Last Updated</dt>
+              <dd className="font-semibold text-white mt-1">
                 {formatDate(complaint.updatedAt)}
               </dd>
             </div>
           </dl>
+
+          {isAdmin && complaint.status !== "Resolved" && (
+            <form onSubmit={handleAdminUpdate} className="mt-6 pt-6 border-t border-slate-700 space-y-4">
+              <h4 className="text-sm font-semibold text-white">
+                Admin Actions
+              </h4>
+
+              <div>
+                <label className="form-label" htmlFor="admin-status">
+                  Status
+                </label>
+                <select
+                  id="admin-status"
+                  value={updateForm.status}
+                  onChange={(e) =>
+                    setUpdateForm((prev) => ({
+                      ...prev,
+                      status: e.target.value,
+                    }))
+                  }
+                  className="form-input"
+                >
+                  <option>Open</option>
+                  <option>In Progress</option>
+                  <option>Resolved</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="form-label" htmlFor="admin-priority">
+                  Priority
+                </label>
+                <select
+                  id="admin-priority"
+                  value={updateForm.priority}
+                  onChange={(e) =>
+                    setUpdateForm((prev) => ({
+                      ...prev,
+                      priority: e.target.value,
+                    }))
+                  }
+                  className="form-input"
+                >
+                  <option>Low</option>
+                  <option>Medium</option>
+                  <option>High</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="form-label" htmlFor="admin-note">
+                  Note
+                  <span className="ml-1 font-normal text-slate-400">(optional)</span>
+                </label>
+                <textarea
+                  id="admin-note"
+                  rows={2}
+                  value={updateForm.note}
+                  onChange={(e) =>
+                    setUpdateForm((prev) => ({
+                      ...prev,
+                      note: e.target.value,
+                    }))
+                  }
+                  className="form-textarea"
+                  placeholder="Add a note recorded in status history..."
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={updating}
+                className="form-btn w-full"
+              >
+                {updating ? "Saving..." : "Save Changes"}
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </MainLayout>

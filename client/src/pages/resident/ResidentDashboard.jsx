@@ -74,7 +74,7 @@ function ResidentDashboard() {
       <MainLayout>
         <div className="flex justify-center items-center h-[70vh]">
 
-          <div className="text-xl font-semibold">
+          <div className="text-xl font-semibold text-slate-100">
             Loading Dashboard...
           </div>
 
@@ -91,11 +91,11 @@ function ResidentDashboard() {
       <div className="mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
 
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">
+          <h1 className="text-3xl font-bold text-slate-100">
             Resident Dashboard
           </h1>
 
-          <p className="text-slate-500 mt-2">
+          <p className="text-slate-400 mt-2">
             Here's an overview of your activity.
           </p>
         </div>
@@ -146,16 +146,16 @@ function ResidentDashboard() {
 
         {/* Latest Notices */}
 
-        <div className="xl:col-span-1 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div className="xl:col-span-1 content-card">
 
-          <h2 className="text-xl font-semibold mb-6">
+          <h2 className="text-xl font-semibold mb-6 text-white">
             Latest Notices
           </h2>
 
           {
             notices.length === 0 ? (
 
-              <p className="text-gray-500">
+              <p className="card-muted">
                 No notices available.
               </p>
 
@@ -169,20 +169,20 @@ function ResidentDashboard() {
                       key={notice._id}
                       className={`border-l-4 pl-4 ${
                         notice.important
-                          ? "border-purple-500"
-                          : "border-blue-600"
+                          ? "border-purple-400"
+                          : "border-blue-500"
                       }`}
                     >
                       <div className="flex items-center gap-2">
-                        <h3 className="font-semibold">{notice.title}</h3>
+                        <h3 className="font-semibold text-white">{notice.title}</h3>
                         {notice.important && (
-                          <span className="text-[10px] font-bold uppercase tracking-wide bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-bold uppercase tracking-wide bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-full">
                             Important
                           </span>
                         )}
                       </div>
 
-                      <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                      <p className="text-sm card-muted mt-1 line-clamp-2">
                         {notice.content}
                       </p>
                     </div>
@@ -198,45 +198,45 @@ function ResidentDashboard() {
 
         {/* Complaint Summary */}
 
-        <div className="xl:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div className="xl:col-span-2 content-card">
 
-          <h2 className="text-xl font-semibold mb-6">
+          <h2 className="text-xl font-semibold mb-6 text-white">
             Complaint Summary
           </h2>
 
           <div className="grid grid-cols-3 gap-6">
 
-            <div className="bg-slate-50 rounded-xl p-6 text-center">
+            <div className="stat-box">
 
-              <p className="text-4xl font-bold text-blue-600">
+              <p className="text-4xl font-bold text-blue-400">
                 {stats.total}
               </p>
 
-              <p className="mt-2 text-gray-500">
+              <p className="mt-2 card-muted">
                 Total
               </p>
 
             </div>
 
-            <div className="bg-slate-50 rounded-xl p-6 text-center">
+            <div className="stat-box">
 
-              <p className="text-4xl font-bold text-orange-500">
+              <p className="text-4xl font-bold text-orange-400">
                 {stats.pending}
               </p>
 
-              <p className="mt-2 text-gray-500">
+              <p className="mt-2 card-muted">
                 Pending
               </p>
 
             </div>
 
-            <div className="bg-slate-50 rounded-xl p-6 text-center">
+            <div className="stat-box">
 
-              <p className="text-4xl font-bold text-green-600">
+              <p className="text-4xl font-bold text-green-400">
                 {stats.resolved}
               </p>
 
-              <p className="mt-2 text-gray-500">
+              <p className="mt-2 card-muted">
                 Resolved
               </p>
 
@@ -250,9 +250,9 @@ function ResidentDashboard() {
 
       {/* Recent Complaints */}
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mt-10">
+      <div className="content-card mt-10">
 
-        <h2 className="text-xl font-semibold mb-6">
+        <h2 className="text-xl font-semibold mb-6 text-white">
           My Recent Complaints
         </h2>
 
@@ -260,7 +260,7 @@ function ResidentDashboard() {
           complaints.length === 0 ? (
 
             <div className="text-center py-8">
-              <p className="text-gray-500 mb-4">
+              <p className="card-muted mb-4">
                 No complaints found.
               </p>
               <ActionLink to="/resident/complaints/create">
@@ -273,16 +273,16 @@ function ResidentDashboard() {
 
             <div className="overflow-x-auto">
 
-              <table className="w-full">
+              <table className="w-full data-table">
 
-                <thead className="border-b">
+                <thead>
 
-                  <tr className="text-left">
+                  <tr>
 
-                    <th className="pb-4">Title</th>
-                    <th className="pb-4">Category</th>
-                    <th className="pb-4">Priority</th>
-                    <th className="pb-4">Status</th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Priority</th>
+                    <th>Status</th>
 
                   </tr>
 
@@ -293,12 +293,9 @@ function ResidentDashboard() {
                   {
                     complaints.slice(0,5).map((item)=>(
 
-                      <tr
-                        key={item._id}
-                        className="border-b hover:bg-slate-50"
-                      >
+                      <tr key={item._id}>
 
-                        <td className="py-4">
+                        <td className="text-white font-medium">
                           {item.title}
                         </td>
 
@@ -307,13 +304,13 @@ function ResidentDashboard() {
                         </td>
 
                         <td>
-                          <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-600 text-sm">
+                          <span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-sm">
                             {item.priority}
                           </span>
                         </td>
 
                         <td>
-                          <span className="px-3 py-1 rounded-full bg-green-100 text-green-600 text-sm">
+                          <span className="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-sm">
                             {item.status}
                           </span>
                         </td>

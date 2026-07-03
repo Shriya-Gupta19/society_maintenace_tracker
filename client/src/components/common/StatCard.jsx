@@ -10,16 +10,16 @@ function StatCard({
     <motion.div
       whileHover={{ y: -6 }}
       transition={{ duration: 0.2 }}
-      className="bg-white rounded-2xl shadow-sm hover:shadow-lg p-6 border border-slate-200"
+      className="content-card"
     >
       <div className="flex items-center justify-between">
 
         <div>
-          <p className="text-sm text-slate-500 mb-2">
+          <p className="text-sm card-muted mb-2">
             {title}
           </p>
 
-          <h2 className="text-4xl font-bold text-slate-800">
+          <h2 className="text-4xl font-bold text-white">
             {value}
           </h2>
         </div>

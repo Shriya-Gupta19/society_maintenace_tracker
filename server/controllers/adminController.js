@@ -12,7 +12,15 @@ const getAllComplaints = async (req, res) => {
 
     const complaints = await Complaint.find()
       .populate("resident", "name email flatNumber")
-      .sort({ overdue: -1, priority: -1, createdAt: -1 });
+      .sort({ overdue: -1, createdAt: -1 });
+
+    const priorityRank = { High: 3, Medium: 2, Low: 1 };
+    complaints.sort((a, b) => {
+      if (a.overdue !== b.overdue) {
+        return a.overdue ? -1 : 1;
+      }
+      return (priorityRank[b.priority] || 0) - (priorityRank[a.priority] || 0);
+    });
 
     res.status(200).json({
       success: true,

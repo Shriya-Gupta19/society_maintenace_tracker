@@ -10,9 +10,9 @@ import {
 
 function CategoryChart({ data }) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+    <div className="content-card">
 
-      <h2 className="text-xl font-semibold mb-6">
+      <h2 className="text-xl font-semibold mb-6 text-white">
         Complaints by Category
       </h2>
 
@@ -22,16 +22,24 @@ function CategoryChart({ data }) {
 
           <BarChart data={data}>
 
-            <CartesianGrid strokeDasharray="3 3" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
 
-            <XAxis dataKey="name" />
+            <XAxis dataKey="name" stroke="#94a3b8" tick={{ fill: "#94a3b8" }} />
 
-            <YAxis allowDecimals={false} />
+            <YAxis allowDecimals={false} stroke="#94a3b8" tick={{ fill: "#94a3b8" }} />
 
-            <Tooltip />
+            <Tooltip
+              contentStyle={{
+                background: "#1e293b",
+                border: "1px solid #334155",
+                borderRadius: "0.75rem",
+                color: "#f1f5f9",
+              }}
+            />
 
             <Bar
               dataKey="value"
+              fill="#3b82f6"
               radius={[8, 8, 0, 0]}
             />
 
