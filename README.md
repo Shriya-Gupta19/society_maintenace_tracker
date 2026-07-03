@@ -29,7 +29,7 @@ society_maintenance_tracker/
 ### Prerequisites
 
 - Node.js 18+
-- MongoDB running locally or MongoDB Atlas URI
+- MongoDB running locally or MongoDB Atlas URI.
 
 ### 1. Backend Setup
 
