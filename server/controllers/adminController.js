@@ -91,9 +91,12 @@ const updatePriority = async (req, res) => {
 // Dashboard Statistics
 const getDashboardStats = async (req, res) => {
   try {
+
     const totalComplaints = await Complaint.countDocuments();
 
-    const open = await Complaint.countDocuments({ status: "Open" });
+    const open = await Complaint.countDocuments({
+      status: "Open",
+    });
 
     const inProgress = await Complaint.countDocuments({
       status: "In Progress",
@@ -107,8 +110,75 @@ const getDashboardStats = async (req, res) => {
       priority: "High",
     });
 
+    // Complaints By Category
+
+    const categoryStats = await Complaint.aggregate([
+      {
+        $group: {
+          _id: "$category",
+          value: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          name: "$_id",
+          value: 1,
+        },
+      },
+      {
+        $sort: {
+          value: -1,
+        },
+      },
+    ]);
+
+    // Monthly Complaints
+
+    const monthlyStats = await Complaint.aggregate([
+      {
+        $group: {
+          _id: {
+            month: {
+              $month: "$createdAt",
+            },
+          },
+          complaints: {
+            $sum: 1,
+          },
+        },
+      },
+      {
+        $sort: {
+          "_id.month": 1,
+        },
+      },
+    ]);
+
+    const months = [
+      "",
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    const formattedMonthly = monthlyStats.map((item) => ({
+      month: months[item._id.month],
+      complaints: item.complaints,
+    }));
+
     res.status(200).json({
       success: true,
+
       dashboard: {
         totalComplaints,
         open,
@@ -116,15 +186,22 @@ const getDashboardStats = async (req, res) => {
         resolved,
         highPriority,
       },
+
+      categoryStats,
+
+      monthlyStats: formattedMonthly,
     });
 
   } catch (error) {
+
     res.status(500).json({
       success: false,
       message: error.message,
     });
+
   }
 };
+
 
 module.exports = {
   getAllComplaints,

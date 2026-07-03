@@ -14,21 +14,35 @@ import ManageComplaints from "../pages/complaints/ManageComplaints";
 import AdminNotices from "../pages/notices/AdminNotices";
 import ResidentNotices from "../pages/notices/ResidentNotices";
 
+import ResidentProfile from "../pages/profile/ResidentProfile";
+import AdminProfile from "../pages/profile/AdminProfile";
+
 import ProtectedRoute from "./ProtectedRoute";
 
 function AppRoutes() {
   return (
     <Routes>
-      {/* Default */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
+
+      {/* Default Route */}
+      <Route
+        path="/"
+        element={<Navigate to="/login" replace />}
+      />
 
       {/* Authentication */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route
+        path="/login"
+        element={<Login />}
+      />
 
-      {/* ========================= */}
+      <Route
+        path="/register"
+        element={<Register />}
+      />
+
+      {/* ======================= */}
       {/* Resident Routes */}
-      {/* ========================= */}
+      {/* ======================= */}
 
       <Route
         path="/resident/dashboard"
@@ -66,9 +80,27 @@ function AppRoutes() {
         }
       />
 
-      {/* ========================= */}
+      <Route
+        path="/resident/notices"
+        element={
+          <ProtectedRoute>
+            <ResidentNotices />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/resident/profile"
+        element={
+          <ProtectedRoute>
+            <ResidentProfile />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ======================= */}
       {/* Admin Routes */}
-      {/* ========================= */}
+      {/* ======================= */}
 
       <Route
         path="/admin/dashboard"
@@ -87,32 +119,31 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
       <Route
-  path="/admin/notices"
-  element={
-    <ProtectedRoute>
-      <AdminNotices />
-    </ProtectedRoute>
-  }
-/>
+        path="/admin/notices"
+        element={
+          <ProtectedRoute>
+            <AdminNotices />
+          </ProtectedRoute>
+        }
+      />
 
-<Route
-  path="/resident/notices"
-  element={
-    <ProtectedRoute>
-      <ResidentNotices />
-    </ProtectedRoute>
-  }
-/>
+      <Route
+        path="/admin/profile"
+        element={
+          <ProtectedRoute>
+            <AdminProfile />
+          </ProtectedRoute>
+        }
+      />
 
-      {/* ========================= */}
-      {/* 404 */}
-      {/* ========================= */}
-
+      {/* 404 Route */}
       <Route
         path="*"
         element={<Navigate to="/login" replace />}
       />
+
     </Routes>
   );
 }

@@ -6,11 +6,14 @@ import {
   LogOut,
   Building2,
 } from "lucide-react";
+
 import { NavLink, useNavigate } from "react-router-dom";
+
 import { useAuth } from "../context/AuthContext";
 
 function Sidebar() {
   const { user, logout } = useAuth();
+
   const navigate = useNavigate();
 
   const isAdmin = user?.role === "admin";
@@ -33,22 +36,21 @@ function Sidebar() {
     },
 
     {
-        title: "Notices",
-        icon: <Bell size={20} />,
-        path: isAdmin
+      title: "Notices",
+      icon: <Bell size={20} />,
+      path: isAdmin
         ? "/admin/notices"
         : "/resident/notices",
     },
 
-    // Uncomment after Profile module is completed
+    {
+      title: "Profile",
+      icon: <User size={20} />,
+      path: isAdmin
+        ? "/admin/profile"
+        : "/resident/profile",
+    },
 
-    // {
-    //   title: "Profile",
-    //   icon: <User size={20} />,
-    //   path: isAdmin
-    //     ? "/admin/profile"
-    //     : "/resident/profile",
-    // },
   ];
 
   const handleLogout = () => {
@@ -106,23 +108,24 @@ function Sidebar() {
       {/* Navigation */}
 
       <nav className="flex-1 px-3 py-5">
-
-        {menu.map((item) => (
+                {menu.map((item) => (
 
           <NavLink
             key={item.title}
             to={item.path}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-xl mb-2 transition-all ${
+              `flex items-center gap-3 px-4 py-3 rounded-xl mb-2 transition-all duration-200 ${
                 isActive
                   ? "bg-blue-600 text-white"
-                  : "hover:bg-slate-800 text-slate-200"
+                  : "text-slate-200 hover:bg-slate-800 hover:text-white"
               }`
             }
           >
             {item.icon}
 
-            <span>{item.title}</span>
+            <span className="font-medium">
+              {item.title}
+            </span>
 
           </NavLink>
 
@@ -130,16 +133,19 @@ function Sidebar() {
 
       </nav>
 
-      {/* Footer */}
+      {/* Logout */}
 
       <div className="border-t border-slate-700 p-4">
 
         <button
           onClick={handleLogout}
-          className="w-full bg-red-600 hover:bg-red-700 rounded-xl py-3 flex justify-center items-center gap-2 transition"
+          className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 rounded-xl py-3 transition-all font-medium"
         >
+
           <LogOut size={18} />
+
           Logout
+
         </button>
 
       </div>
@@ -149,3 +155,5 @@ function Sidebar() {
 }
 
 export default Sidebar;
+
+      
